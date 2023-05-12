@@ -19,33 +19,54 @@ builder.Password = config["SQLPWD"];
 //Console.WriteLine(builder.ConnectionString);
 
 List<rtItem> sqlrtItems = new();
- 
+int myRowCount = 0;
+//backyard, Spicy Water
+string qry = "select * from Items where Location = 'backyard'";
+string Loc = "backyard' or 1=1";
+//backyard;'' ''select * from items'
+//Loc = "backyard";
 
-string qry = String.Empty;
+qry = "select * from Items where Location = '" + Loc + "'";
+
+qry = "exec [dbo].[usp_GetAllItemsbyLocation] 'backyard'";
+qry = "exec [dbo].[usp_GetAllItemsbyLocation] " + "'" + Loc ;
+
+Console.WriteLine("SQL Query: " + qry );
+
 SqlDataReader dataReader;
 SqlConnection SQLCn = new SqlConnection(builder.ConnectionString);
 await SQLCn.OpenAsync();
 SqlCommand command = new SqlCommand(qry, SQLCn);
         
-        dataReader = await command.ExecuteReaderAsync();
+dataReader = await command.ExecuteReaderAsync();
 
-        while (dataReader.Read())
-        {
-            sqlrtItems.Add(new rtItem()
-            {
-                rtId = dataReader.GetInt32(0),
-                rtUserObjectId = dataReader.GetString(1),
-                rtDescription = dataReader.GetString(2),
-                rtLocation = dataReader.GetString(3),
-                rtDateTime = dataReader.GetDateTime(4),
-                rtImagePath = dataReader.GetString(5)
-            });
-        }
+while (dataReader.Read())
+{
+    sqlrtItems.Add(new rtItem()
+    {
+        rtId = dataReader.GetInt32(0),
+        rtUserObjectId = dataReader.GetString(1),
+        rtDescription = dataReader.GetString(2),
+        rtLocation = dataReader.GetString(3),
+        rtDateTime = dataReader.GetDateTime(4),
+        rtImagePath = dataReader.GetString(5)        
+    });
+    myRowCount++;
+}
 
-        // Tim beleives these are superfluous
-        dataReader.Close();
-        command.Dispose();
-        SQLCn.Close();
+Console.WriteLine("SQL Query: " + qry );
+Console.WriteLine("Number of rows: " + myRowCount);
+
+// write a loop to write out all the items in the list
+// foreach (rtItem item in sqlrtItems)
+// {
+//     Console.WriteLine(item.ToString());
+// }
+
+
+dataReader.Close();
+command.Dispose();
+SQLCn.Close();
 
 
 
